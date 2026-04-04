@@ -23,8 +23,17 @@ def fetch_website_contents(url):
         text = ""
     
     return (title + '\n\n' + text)[:2000]
-        
 
+
+
+def fetch_website_links(url):
+    """
+    Return the links on the webiste at the given url
+    """
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.content, "html.parser")
+    links = [link.get("href") for link in soup.find_all("a")]
+    return [link for link in links if link]
 
 
 
@@ -118,9 +127,49 @@ becomes roughly:
 "Hello\nWelcome to my site"
 
 ----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 
+Find all anchor tags and extract href values
 
+links = [link.get("href") for link in soup.find_all("a")]
+
+This is the most important line.
+soup.find_all("a")
+
+Finds all HTML anchor tags:
+<a href="https://google.com">Google</a>
+<a href="/about">About</a>
+<a>Broken link</a>
+
+link.get("href")
+For each <a> tag, it gets the value of the href attribute.
+
+So this line builds a list like:
+[
+    "https://google.com",
+    "/about",
+    None
+]
+
+Why None?
+Because some <a> tags may exist without an href.
 
 ----------------------------------------------------------------------------------------------------
 
+Remove empty or missing links:
+
+return [link for link in links if link]
+
+This filters out invalid values like:
+None
+empty strings ""
+
+So if links is:
+["https://google.com", "/about", None, ""]
+
+It returns:
+["https://google.com", "/about"]
+
+----------------------------------------------------------------------------------------------------
 """
